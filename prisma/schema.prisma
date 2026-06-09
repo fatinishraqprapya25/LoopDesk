@@ -40,17 +40,19 @@ enum ProjectBlockTypes {
 }
 
 model User {
-  id         String      @id @default(uuid())
-  email      String      @unique
-  name       String
-  password   String
-  role       UserRole
-  status     UserStatus
-  lastLogin  DateTime?
-  workspaces Workspace[]
-  projects   Project[]
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id             String          @id @default(uuid())
+  email          String          @unique
+  name           String
+  password       String
+  role           UserRole
+  status         UserStatus
+  lastLogin      DateTime?
+  workspaces     Workspace[]
+  projects       Project[]       @relation("ProjectCreator")
+  projectMembers ProjectMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("users")
 }
@@ -69,17 +71,18 @@ model Workspace {
 }
 
 model Project {
-  id          String         @id @default(uuid())
+  id          String          @id @default(uuid())
   name        String
   description String
   status      ProjectStatus
   createdBy   String
-  user        User           @relation(fields: [createdBy], references: [id])
+  user        User            @relation("ProjectCreator", fields: [createdBy], references: [id])
   workspaceId String
-  workspace   Workspace      @relation(fields: [workspaceId], references: [id])
+  workspace   Workspace       @relation(fields: [workspaceId], references: [id])
   blocks      ProjectBlock[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  members     ProjectMember[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 
   @@map("projects")
 }
@@ -92,4 +95,16 @@ model ProjectBlock {
   project   Project           @relation(fields: [projectId], references: [id])
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
+
+  @@map("blocks")
+}
+
+model ProjectMember {
+  id        String  @id @default(uuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@map("projectMembers")
 }
