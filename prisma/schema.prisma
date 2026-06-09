@@ -28,16 +28,17 @@ enum ProjectStatus {
 }
 
 model User {
-  id        String      @id @default(uuid())
-  email     String      @unique
-  name      String
-  password  String
-  role      UserRole
-  status    UserStatus
-  lastLogin DateTime?
-  workspace Workspace[]
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id         String      @id @default(uuid())
+  email      String      @unique
+  name       String
+  password   String
+  role       UserRole
+  status     UserStatus
+  lastLogin  DateTime?
+  workspaces Workspace[]
+  projects   Project[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 
   @@map("users")
 }
@@ -60,6 +61,8 @@ model Project {
   name        String
   description String
   status      ProjectStatus
+  createdBy   String
+  user        User          @relation(fields: [createdBy], references: [id])
   workspaceId String
   workspace   Workspace     @relation(fields: [workspaceId], references: [id])
   createdAt   DateTime      @default(now())
@@ -67,3 +70,4 @@ model Project {
 
   @@map("projects")
 }
+
