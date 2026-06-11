@@ -3,7 +3,7 @@ import { Response } from 'express';
 interface ApiResponse<T> {
     success: boolean;
     message: string;
-    data?: T;
+    data?: T | undefined;
 }
 
 export const sendResponse = <T>(
