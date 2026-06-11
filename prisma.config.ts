@@ -1,3 +1,4 @@
+import { PrismaClient } from "@prisma/client";
 import "dotenv/config";
 import { defineConfig, env } from "prisma/config";
 
@@ -10,3 +11,5 @@ export default defineConfig({
     url: env("DATABASE_URL"),
   },
 });
+
+export const prisma = new PrismaClient();

@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import cors from 'cors';
 import { globalErrorHandler } from './middlewares/globalErrorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
@@ -16,6 +16,5 @@ app.use(globalErrorHandler);
 const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
 
 gracefulShutdown(server);
