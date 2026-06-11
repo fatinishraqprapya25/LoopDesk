@@ -27,12 +27,7 @@ app.get('/health', async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-app.use((req: Request, res: Response, next: NextFunction): void => {
-    res.status(404).json({
-        success: false,
-        message: `API route not found: ${req.originalUrl}`
-    });
-});
+app.use();
 
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
     console.error(err.stack);
