@@ -1,6 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
+import { sendResponse } from './utils/sendResponse.js';
+import { globalErrorHandler } from './middlewares/globalErrorHandler.js';
+import { notFoundHandler } from './middlewares/notFoundHandler.js';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -10,32 +13,20 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/health', async (req: Request, res: Response): Promise<void> => {
+app.get('/health', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         await prisma.$queryRaw`SELECT 1`;
-        res.status(200).json({
-            status: 'UP',
-            message: 'Server and database are healthy',
-            timestamp: new Date()
+        sendResponse(res, 200, {
+            message: 'Server and database connection are completely operational.',
         });
-    } catch (error: any) {
-        res.status(500).json({
-            status: 'DOWN',
-            message: 'Database connection failed',
-            error: error.message
-        });
+    } catch (error) {
+        next(error);
     }
 });
 
-app.use();
+app.use(notFoundHandler);
 
-app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
-    console.error(err.stack);
-    res.status(err.status || 500).json({
-        success: false,
-        message: err.message || 'Internal Server Error'
-    });
-});
+app.use(globalErrorHandler);
 
 const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
