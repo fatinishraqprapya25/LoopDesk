@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 import { sendResponse } from "../../utils/sendResponse.js";
-
-const prisma = new PrismaClient();
+import prisma from "../../config/prisma.js";
 
 const checkHealth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
