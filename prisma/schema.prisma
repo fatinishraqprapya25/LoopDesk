@@ -6,28 +6,26 @@ datasource db {
   provider = "postgresql"
 }
 
-// user roles
+// enums
+
 enum UserRole {
   USER
   ADMIN
   SUPER_ADMIN
 }
 
-// user status
 enum UserStatus {
   ACTIVE
   INACTIVE
   SUSPENDED
 }
 
-// project status
 enum ProjectStatus {
   STARTED
   DELEVERED
   CANCELLED
 }
 
-// project block types
 enum ProjectBlockTypes {
   HEADING1
   HEADING2
@@ -39,7 +37,6 @@ enum ProjectBlockTypes {
   TASK_GROUP
 }
 
-// project role
 enum ProjectRole {
   ADMIN
   MEMBER
@@ -47,22 +44,73 @@ enum ProjectRole {
 }
 
 model User {
-  id             String          @id @default(uuid())
-  email          String          @unique
-  name           String
-  password       String
-  role           UserRole
-  avatar         String
-  status         UserStatus
-  lastLogin      DateTime?
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  password  String?
+  role      UserRole   @default(USER)
+  avatar    String?
+  status    UserStatus @default(ACTIVE)
+  lastLogin DateTime?
+
   workspaces     Workspace[]
   projects       Project[]       @relation("ProjectCreator")
   projectMembers ProjectMember[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
 
-  @@map("users")
+  @@map("user")
 }
+
+model Session {
+  id        String   @id @default(uuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(uuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id @default(uuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+
+  @@map("verification")
+}
+
 
 model Workspace {
   id          String    @id @default(uuid())

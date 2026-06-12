@@ -9,10 +9,13 @@ interface AppRoute {
 }
 
 const router = express.Router();
+router.use("/auth/*splat", toNodeHandler(auth));
+
+router.use(express.json());
+router.use(express.urlencoded({ extended: true }));
 
 const routes: AppRoute[] = [
-    { path: "/admin", handler: adminRouter },
-    { path: "/auth/*", handler: toNodeHandler(auth) as any }
+    { path: "/admin", handler: adminRouter }
 ];
 
 routes.forEach(route => {
